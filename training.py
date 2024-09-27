@@ -30,7 +30,17 @@ num_epochs = 250
 num_train_batches = float(len(train_loader))
 num_val_batches = float(len(test_loader))
 
+
+# Custom
+os.makedirs('saved_models', exist_ok=True)
+save_interval = 50
+
+
 for epoch in range(num_epochs):
+    if epoch % save_interval == 0:
+        torch.save(generator.state_dict(), f'saved_models/generator_epoch_{epoch}.pth')
+        torch.save(discriminator.state_dict(), f'saved_models/discriminator_epoch_{epoch}.pth')
+
     print(f"Epoch {epoch}: ", end ="")
     
     G_adv_loss = 0
@@ -50,6 +60,7 @@ for epoch in range(num_epochs):
       hr_images = hr.to(device)
       lr_images = lr_images.float()
       predicted_hr_images = generator(lr_images)
+      predicted_hr_images = F.interpolate(predicted_hr_images, size=hr_images.shape[2:], mode='bilinear', align_corners=False) # CUSTOM LINE
       predicted_hr_labels = discriminator(predicted_hr_images)
       gf_loss = F.binary_cross_entropy_with_logits(predicted_hr_labels, torch.ones_like(predicted_hr_labels)) #adverserial loss
 
@@ -94,6 +105,11 @@ for epoch in range(num_epochs):
       for batch_idx, (lr, hr) in enumerate(train_loader):
         lr = lr.to(device)
         hr = hr.to(device)
+
+
+
+
+
         lr = lr.float()
         predicted_hr = generator(lr)
 
@@ -116,3 +132,9 @@ for epoch in range(num_epochs):
     wandb.log({"PSNR" : val_psnr, 'epoch':epoch })
     wandb.log({"SSIM" : val_ssim, 'epoch':epoch })
     print(f"PSNR: {val_psnr:.3f} SSIM: {val_ssim:.3f}\n")
+
+
+# Custom
+# After the training loop, save the final model
+torch.save(generator.state_dict(), 'saved_models/generator_final.pth')
+torch.save(discriminator.state_dict(), 'saved_models/discriminator_final.pth')

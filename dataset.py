@@ -29,9 +29,13 @@ class CustomDataset(Dataset):
         return lr , hr
 
 
-dataset = CustomDataset(lr_dir='/content/LR',hr_dir='/content/HR', transform = transforms.Compose([transforms.ToTensor()]))
+train_dataset = CustomDataset(lr_dir='content/train/LR',hr_dir='content/train/HR', transform = transforms.Compose([transforms.ToTensor()]))
+test_dataset = CustomDataset(lr_dir='content/test/LR', hr_dir='content/test/HR', transform=transforms.Compose([transforms.ToTensor()]))
 
-train_set, test_set = torch.utils.data.random_split(dataset, [int(len(dataset)*.80), int(len(dataset)*.20)])
+print(len(train_dataset))
+print(len(test_dataset))
 
-train_loader = DataLoader(train_set,batch_size=4,shuffle=True)
-test_loader = DataLoader(test_set,batch_size=4,shuffle=True)        
+# DataLoader for training and testing sets
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=4, shuffle=True)
+
