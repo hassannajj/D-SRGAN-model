@@ -29,8 +29,8 @@ class CustomDataset(Dataset):
         return lr , hr
 
 
-train_dataset = CustomDataset(lr_dir='content/train/LR',hr_dir='content/train/HR', transform = transforms.Compose([transforms.ToTensor()]))
-test_dataset = CustomDataset(lr_dir='content/test/LR', hr_dir='content/test/HR', transform=transforms.Compose([transforms.ToTensor()]))
+train_dataset = CustomDataset(lr_dir='training_testing_data/train/LR',hr_dir='training_testing_data/train/HR', transform = transforms.Compose([transforms.ToTensor()]))
+test_dataset = CustomDataset(lr_dir='training_testing_data/test/LR', hr_dir='training_testing_data/test/HR', transform=transforms.Compose([transforms.ToTensor()]))
 
 print(len(train_dataset))
 print(len(test_dataset))
