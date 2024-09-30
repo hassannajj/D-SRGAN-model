@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import torch
 import torch.nn as nn
@@ -16,7 +17,7 @@ class CustomDataset(Dataset):
         self.hr_filepath = sorted(glob(os.path.join(self.hr_dir,'*.npy')))
         
     def __len__(self):
-        return len(self.hr_filepath)
+        return len(self.lr_filepath + self.hr_filepath)
     
     def __getitem__(self,index):
         lr = np.load(self.lr_filepath[index])
@@ -28,12 +29,18 @@ class CustomDataset(Dataset):
         
         return lr , hr
 
+try:
+    train_lr, train_hr, test_lr, test_hr = sys.argv[1:]
+except ValueError:
+    print("Wrong syntax, format must be")
+    print("python3 training.py {train_lr} {train_hr} {test_lr} {test_hr}")
+    sys.exit(1)
 
-train_dataset = CustomDataset(lr_dir='training_testing_data/train/LR',hr_dir='training_testing_data/train/HR', transform = transforms.Compose([transforms.ToTensor()]))
-test_dataset = CustomDataset(lr_dir='training_testing_data/test/LR', hr_dir='training_testing_data/test/HR', transform=transforms.Compose([transforms.ToTensor()]))
+train_dataset = CustomDataset(lr_dir=train_lr, hr_dir=train_hr, transform = transforms.Compose([transforms.ToTensor()]))
+test_dataset = CustomDataset(lr_dir=test_lr, hr_dir=test_hr, transform=transforms.Compose([transforms.ToTensor()]))
 
-print(len(train_dataset))
-print(len(test_dataset))
+print("train dataset lenght:", len(train_dataset))
+print("train dataset lenght:", len(test_dataset))
 
 # DataLoader for training and testing sets
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
